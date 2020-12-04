@@ -2,6 +2,21 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+fn read_lines(file_name: &'static str) -> Vec<String> {
+    let path = Path::new(file_name);
+
+    let file = File::open(path).unwrap();
+    let lines = io::BufReader::new(file).lines();
+
+    let mut result = vec![];
+    for line in lines {
+        let line = line.unwrap();
+        result.push(line);
+    }
+
+    result
+}
+
 fn main() {
     println!("Part 1: {:?} trees.", count_trees(3, 1));
 
@@ -22,16 +37,12 @@ const TREE: char = '#';
 fn count_trees(slope_x: usize, slope_y: usize) -> i32 {
     let mut num_trees = 0;
 
-    let lines = {
-        let path = Path::new("input.txt");
-        read_lines(path).unwrap()
-    };
+    let lines = read_lines("input.txt");
 
     let mut terrain = vec![];
 
     for line in lines {
         let mut row = vec![];
-        let line = line.unwrap();
 
         for c in line.chars() {
             if c == TREE || c == EMPTY {
@@ -61,12 +72,4 @@ fn count_trees(slope_x: usize, slope_y: usize) -> i32 {
     }
 
     num_trees
-}
-
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
 }
